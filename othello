@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Othello Quiz with Timer and Answer Highlight</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .question {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .question h3 {
+      margin-bottom: 10px;
+    }
+    .correct {
+      color: green;
+      font-weight: bold;
+    }
+    .incorrect {
+      color: red;
+      font-weight: bold;
+    }
+    .result {
+      font-weight: bold;
+      font-size: 20px;
+      color: #2c3e50;
+      margin-top: 30px;
+    }
+    #timer {
+      font-size: 18px;
+      color: red;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Othello Quiz</h1>
+  <div id="timer">Time Remaining: 05:00</div>
+  <form id="quizForm"></form>
+  <button onclick="gradeQuiz()">Submit Quiz</button>
+  <div class="result" id="result"></div>
+
+  <script>
+    const questions = [
+      { q: "Who is the main antagonist in Othello?", options: ["Cassio", "Roderigo", "Iago", "Brabantio"], answer: 2 },
+      { q: "What is Othello’s military rank?", options: ["Lieutenant", "Captain", "General", "Commander-in-Chief"], answer: 2 },
+      { q: "Who does Othello choose as his lieutenant?", options: ["Iago", "Roderigo", "Montano", "Cassio"], answer: 3 },
+      { q: "Why is Iago angry with Othello at the beginning?", options: ["Othello promoted Cassio over him", "Othello married Desdemona", "Othello demoted him", "Othello insulted him"], answer: 0 },
+      { q: "Who is Desdemona’s father?", options: ["Montano", "Roderigo", "Brabantio", "Gratiano"], answer: 2 },
+      { q: "Where does most of the play take place?", options: ["Venice", "Cyprus", "Rome", "Florence"], answer: 1 },
+      { q: "What item becomes the key piece of evidence in Iago’s plan?", options: ["A letter", "A sword", "A handkerchief", "A ring"], answer: 2 },
+      { q: "How does Desdemona come into possession of the handkerchief?", options: ["Othello gives it to her as a gift", "She buys it", "Emilia gives it to her", "Cassio returns it"], answer: 0 },
+      { q: "Who is Emilia?", options: ["Desdemona’s cousin", "Iago’s wife and Desdemona’s maid", "Cassio’s wife", "Brabantio’s second wife"], answer: 1 },
+      { q: "What is Iago’s main motive throughout the play?", options: ["Revenge and jealousy", "Love for Desdemona", "Patriotism", "Greed"], answer: 0 },
+      { q: "Who kills Desdemona?", options: ["Iago", "Othello", "Emilia", "Roderigo"], answer: 1 },
+      { q: "What does Emilia do after Desdemona’s death?", options: ["Flees", "Stabs Othello", "Reveals Iago’s deceit", "Kills herself"], answer: 2 },
+      { q: "How does Othello die?", options: ["Iago kills him", "He is executed", "He kills himself", "He dies in battle"], answer: 2 },
+      { q: "What literary genre does Othello belong to?", options: ["Comedy", "History", "Tragedy", "Romance"], answer: 2 },
+      { q: "What does Iago use to manipulate Othello’s thoughts?", options: ["Dreams", "Rumors and circumstantial evidence", "Letters", "Poison"], answer: 1 },
+      { q: "Who is wounded in a drunken brawl that leads to Cassio’s demotion?", options: ["Iago", "Montano", "Roderigo", "Lodovico"], answer: 1 },
+      { q: "Who says, “O, beware, my lord, of jealousy; it is the green-eyed monster”?", options: ["Othello", "Iago", "Cassio", "Emilia"], answer: 1 },
+      { q: "Who is Roderigo in love with?", options: ["Emilia", "Bianca", "Desdemona", "None"], answer: 2 },
+      { q: "Who ultimately arrests Iago?", options: ["Lodovico", "Othello", "Gratiano", "Cassio"], answer: 0 },
+      { q: "What is the tone of the ending of Othello?", options: ["Joyful", "Triumphant", "Tragic and somber", "Comic"], answer: 2 }
+    ];
+
+    const quizForm = document.getElementById("quizForm");
+
+    questions.forEach((q, index) => {
+      const qDiv = document.createElement("div");
+      qDiv.className = "question";
+      qDiv.id = `question${index}`;
+      qDiv.innerHTML = `<h3>Q${index + 1}: ${q.q}</h3>`;
+      q.options.forEach((option, optIndex) => {
+        qDiv.innerHTML += `
+          <label id="label-${index}-${optIndex}">
+            <input type="radio" name="q${index}" value="${optIndex}"> ${option}
+          </label><br>
+        `;
+      });
+      quizForm.appendChild(qDiv);
+    });
+
+    function gradeQuiz() {
+      let score = 0;
+
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const correctIndex = q.answer;
+
+        q.options.forEach((_, optIndex) => {
+          const label = document.getElementById(`label-${index}-${optIndex}`);
+          label.classList.remove('correct', 'incorrect');
+        });
+
+        if (selected) {
+          const selectedValue = parseInt(selected.value);
+          if (selectedValue === correctIndex) {
+            score++;
+            document.getElementById(`label-${index}-${selectedValue}`).classList.add("correct");
+          } else {
+            document.getElementById(`label-${index}-${selectedValue}`).classList.add("incorrect");
+            document.getElementById(`label-${index}-${correctIndex}`).classList.add("correct");
+          }
+        } else {
+          // No answer selected — still show the correct one
+          document.getElementById(`label-${index}-${correctIndex}`).classList.add("correct");
+        }
+      });
+
+      document.getElementById("result").textContent =
+        `You scored ${score} out of ${questions.length}. (${Math.round((score / questions.length) * 100)}%)`;
+
+      clearInterval(timerInterval); // stop timer
+      disableQuiz(); // prevent further changes
+    }
+
+    function disableQuiz() {
+      const inputs = document.querySelectorAll('input[type="radio"]');
+      inputs.forEach(input => input.disabled = true);
+    }
+
+    // === Timer ===
+    let totalTime = 5 * 60; // 5 minutes
+    const timerDisplay = document.getElementById("timer");
+
+    function updateTimer() {
+      const minutes = Math.floor(totalTime / 60).toString().padStart(2, '0');
+      const seconds = (totalTime % 60).toString().padStart(2, '0');
+      timerDisplay.textContent = `Time Remaining: ${minutes}:${seconds}`;
+
+      if (totalTime <= 0) {
+        clearInterval(timerInterval);
+        alert("Time's up! Submitting your quiz...");
+        gradeQuiz();
+      }
+
+      totalTime--;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+
+</body>
+</html>
